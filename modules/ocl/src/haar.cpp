@@ -720,6 +720,7 @@ CvSeq *cv::ocl::OclCascadeClassifier::oclHaarDetectObjects( oclMat &gimg, CvMemS
     {
         CvSize winSize0 = cascade->orig_window_size;
         int totalheight = 0;
+        int totalwidth = 0;
         int indexy = 0;
         CvSize sz;
         vector<CvSize> sizev;
@@ -739,13 +740,14 @@ CvSeq *cv::ocl::OclCascadeClassifier::oclHaarDetectObjects( oclMat &gimg, CvMemS
                 continue;
 
             totalheight += sz.height;
+            totalwidth = totalwidth > sz.width ? totalwidth : sz.width;
             sizev.push_back(sz);
             scalev.push_back(factor);
         }
 
         oclMat gimg1(gimg.rows, gimg.cols, CV_8UC1);
-        oclMat gsum(totalheight + 4, gimg.cols + 1, CV_32SC1);
-        oclMat gsqsum(totalheight + 4, gimg.cols + 1, CV_32FC1);
+        oclMat gsum(totalheight + 4, totalwidth, CV_32SC1);
+        oclMat gsqsum(totalheight + 4, totalwidth, CV_32FC1);
 
         cl_mem stagebuffer;
         cl_mem nodebuffer;
